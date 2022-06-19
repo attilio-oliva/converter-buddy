@@ -1,0 +1,29 @@
+[package]
+name = "converter_buddy"
+version = "0.1.0"
+edition = "2021"
+
+license = "MIT"
+description = "File format conversion library. Provides conversion utilities between files with different formats."
+authors = ["Attilio Oliva <attilio.oliva@protonmail.com>"]
+readme = "README.md"
+
+# crates.io metadata
+documentation = "https://docs.rs/image"
+repository = "https://github.com/attilio-oliva/converter-buddy"
+homepage = "https://github.com/attilio-oliva/converter-buddy"
+categories = ["encoding", "multimedia::images", "multimedia::encoding"]
+keywords = ["convert", "file", "format", "extension"]
+
+[dependencies]
+once_cell = "1.10.0"
+image = "0.24.1"
+resvg = "0.22.0"
+usvg = "0.22.0"
+tiny-skia = "0.6.3"
+strum = { version = "0.24.0", features = ["derive"]}
+strum_macros = "0.24"
+
+[lib]
+name = "converter_buddy"
+path = "./src/lib.rs"
