@@ -96,3 +96,10 @@ pub static SVG: Lazy<FormatInfo> = Lazy::new(|| FormatInfo {
     preferred_extension: "svg",
     mime: "image/svg+xml",
 });
+
+pub static PDF: Lazy<FormatInfo> = Lazy::new(|| FormatInfo {
+    format: Format::Pdf,
+    extensions: vec!["pdf"],
+    preferred_extension: "pdf",
+    mime: "application/pdf",
+});

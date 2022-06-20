@@ -16,6 +16,7 @@ pub trait Converter {
             Format::Gif => self.to_gif(input, output),
             Format::WebP => self.to_webp(input, output),
             Format::Svg => self.to_svg(input, output),
+            Format::Pdf => self.to_pdf(input, output),
             _ => Err(ConversionError::UnsupportedOperation),
         }
     }
@@ -43,6 +44,9 @@ pub trait Converter {
         Err(ConversionError::UnsupportedOperation)
     }
     fn to_svg(&self, _input: &Vec<u8>, _output: &mut Vec<u8>) -> Result<(), ConversionError> {
+        Err(ConversionError::UnsupportedOperation)
+    }
+    fn to_pdf(&self, _input: &Vec<u8>, _output: &mut Vec<u8>) -> Result<(), ConversionError> {
         Err(ConversionError::UnsupportedOperation)
     }
 }

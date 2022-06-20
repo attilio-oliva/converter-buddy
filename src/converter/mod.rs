@@ -30,7 +30,6 @@ pub mod test_utils {
         env::temp_dir().join("converted_file")
     }
 
-    //TODO: add test for this utility
     pub fn test_conversion_to(
         format: Format,
         converter: &dyn Converter,

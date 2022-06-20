@@ -16,6 +16,7 @@ impl Converter for SvgConverter {
             Format::Tiff,
             Format::Bmp,
             Format::Gif,
+            Format::Pdf
         ]
     }
 
@@ -28,14 +29,14 @@ impl Converter for SvgConverter {
         converter.push(Format::Png);
         converter.push(Format::Bmp);
 
-        converter.process(input, output, &Format::Svg)
+        converter.process(input, output, Format::Svg)
     }
     fn to_tiff(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         let mut converter = QueueConverter::new();
         converter.push(Format::Png);
         converter.push(Format::Tiff);
 
-        converter.process(input, output, &Format::Svg)
+        converter.process(input, output, Format::Svg)
     }
     fn to_png(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         let mut opt = usvg::Options::default();
@@ -62,15 +63,23 @@ impl Converter for SvgConverter {
         converter.push(Format::Png);
         converter.push(Format::Jpeg);
 
-        converter.process(input, output, &Format::Svg)
+        converter.process(input, output, Format::Svg)
     }
     fn to_gif(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         let mut converter = QueueConverter::new();
         converter.push(Format::Png);
         converter.push(Format::Gif);
 
-        converter.process(input, output, &Format::Svg)
+        converter.process(input, output, Format::Svg)
     }
+    fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
+        let mut converter = QueueConverter::new();
+        converter.push(Format::Jpeg);
+        converter.push(Format::Pdf);
+
+        converter.process(input, output, Format::Svg)
+    }
+
 }
 
 #[cfg(test)]
@@ -83,6 +92,7 @@ mod tests {
     use image::codecs::tiff::TiffDecoder;
 
     use crate::converter::{test_utils, Converter, SvgConverter};
+    use crate::decoder::PdfDecoder;
     use crate::format::Format;
 
     // Implementation of the used Converter trait
@@ -94,13 +104,14 @@ mod tests {
     #[test]
     fn test_supported_formats() {
         let formats = CONVERTER.supported_formats();
-        assert_eq!(formats.len(), 6);
+        assert_eq!(formats.len(), 7);
         assert!(formats.contains(&Format::Svg));
         assert!(formats.contains(&Format::Tiff));
         assert!(formats.contains(&Format::Png));
         assert!(formats.contains(&Format::Jpeg));
         assert!(formats.contains(&Format::Bmp));
         assert!(formats.contains(&Format::Gif));
+        assert!(formats.contains(&Format::Pdf));
     }
 
     #[test]
@@ -198,6 +209,20 @@ mod tests {
             |_, target| {
                 let decoding = GifDecoder::new(target);
                 decoding.is_ok()
+            },
+        );
+    }
+    #[test]
+    fn test_to_pdf() {
+        let target_ext = "pdf";
+
+        test_utils::test_conversion_to(
+            Format::Pdf,
+            &CONVERTER,
+            SOURCE_EXT,
+            target_ext,
+            |_, target| {
+                PdfDecoder::check(&target)
             },
         );
     }

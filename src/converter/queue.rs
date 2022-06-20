@@ -4,6 +4,7 @@ use crate::{converter::from_format, format::Format};
 
 use super::ConversionError;
 
+#[derive(Default)]
 pub struct QueueConverter {
     queue: VecDeque<Format>,
 }
@@ -29,9 +30,9 @@ impl QueueConverter {
         &mut self,
         input: &Vec<u8>,
         output: &mut Vec<u8>,
-        format: &Format,
+        source_format: Format,
     ) -> Result<(), ConversionError> {
-        let mut source_format = format.clone();
+        let mut source_format = source_format.clone();
 
         let mut current_input = input.to_owned();
 
@@ -87,7 +88,7 @@ mod tests {
 
         source_file.read_to_end(&mut input).unwrap();
 
-        let conversion_operation = queue_converter.process(&input, &mut output, &source_format);
+        let conversion_operation = queue_converter.process(&input, &mut output, source_format);
         assert!(conversion_operation.is_ok());
 
         target_file.write_all(&output).unwrap();

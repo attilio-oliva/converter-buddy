@@ -2,7 +2,7 @@ use super::img_utils::*;
 use image::ImageFormat;
 
 use crate::{
-    converter::{ConversionError, Converter},
+    converter::{ConversionError, Converter, QueueConverter},
     format::Format,
 };
 
@@ -17,6 +17,7 @@ impl Converter for WebPConverter {
             Format::Tiff,
             Format::Bmp,
             Format::Gif,
+            Format::Pdf
         ]
     }
 
@@ -39,6 +40,13 @@ impl Converter for WebPConverter {
     fn to_gif(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         wrapper::image_crate_conversion(input, output, ImageFormat::Gif)
     }
+    fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
+        let mut converter = QueueConverter::new();
+        converter.push(Format::Png);
+        converter.push(Format::Pdf);
+
+        converter.process(input, output, Format::WebP)
+    }
 }
 
 #[cfg(test)]
@@ -51,6 +59,7 @@ mod tests {
     use image::codecs::tiff::TiffDecoder;
 
     use crate::converter::{test_utils, Converter, WebPConverter};
+    use crate::decoder::PdfDecoder;
     use crate::format::Format;
 
     // Implementation of the used Converter trait
@@ -62,13 +71,14 @@ mod tests {
     #[test]
     fn test_supported_formats() {
         let formats = CONVERTER.supported_formats();
-        assert_eq!(formats.len(), 6);
+        assert_eq!(formats.len(), 7);
         assert!(formats.contains(&Format::WebP));
         assert!(formats.contains(&Format::Tiff));
         assert!(formats.contains(&Format::Png));
         assert!(formats.contains(&Format::Jpeg));
         assert!(formats.contains(&Format::Bmp));
         assert!(formats.contains(&Format::Gif));
+        assert!(formats.contains(&Format::Pdf));
     }
 
     #[test]
@@ -166,6 +176,21 @@ mod tests {
             |_, target| {
                 let decoding = GifDecoder::new(target);
                 decoding.is_ok()
+            },
+        );
+    }
+
+    #[test]
+    fn test_to_pdf() {
+        let target_ext = "pdf";
+
+        test_utils::test_conversion_to(
+            Format::Pdf,
+            &CONVERTER,
+            SOURCE_EXT,
+            target_ext,
+            |_, target| {
+                PdfDecoder::check(&target)
             },
         );
     }
