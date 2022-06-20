@@ -29,7 +29,7 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="4"
-     inkscape:cx="75.375"
+     inkscape:cx="76.375"
      inkscape:cy="66.75"
      inkscape:window-width="1920"
      inkscape:window-height="1011"
@@ -72,13 +72,13 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        x="1.9186857"
        y="12.164925"
        id="text186"><tspan
          sodipodi:role="line"
          id="tspan184"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro';stroke-width:0.264583"
          x="1.9186857"
          y="12.164925">SVG</tspan></text>
     <rect
