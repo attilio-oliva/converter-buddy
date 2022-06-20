@@ -9,7 +9,7 @@ authors = ["Attilio Oliva <attilio.oliva@protonmail.com>"]
 readme = "README.md"
 
 # crates.io metadata
-documentation = "https://docs.rs/image"
+documentation = "https://docs.rs/converter_buddy"
 repository = "https://github.com/attilio-oliva/converter-buddy"
 homepage = "https://github.com/attilio-oliva/converter-buddy"
 categories = ["encoding", "multimedia::images", "multimedia::encoding"]
