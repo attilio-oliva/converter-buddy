@@ -60,6 +60,6 @@ pub mod test_utils {
         let readable_output = fs::File::open(&target_path).unwrap();
         assert!(decodable_tester(source_file, readable_output));
 
-        //fs::remove_file(target_path).unwrap();
+        fs::remove_file(target_path).unwrap();
     }
 }

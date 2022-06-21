@@ -1,4 +1,4 @@
-use std::{fs::File, os::unix::prelude::FileExt};
+use std::{fs::File, io::Read};
 
 pub struct PdfDecoder;
 
@@ -9,7 +9,7 @@ impl PdfDecoder {
 
     pub fn check(file: &File) -> bool {
         let mut signature: [u8;4] = [0;4];
-        file.read_at(&mut signature, 0).unwrap();
+        <&File>::clone(&file).read_exact(&mut signature).unwrap();
         Self::check_magic_bytes(&signature)
     }
 }
