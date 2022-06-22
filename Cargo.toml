@@ -26,6 +26,13 @@ strum_macros = "0.24"
 pdf-writer = "0.6"
 miniz_oxide = "0.5.3"
 
+[features]
+default = ["formats", "converters", "io", "decoders"]
+formats = []
+converters = ["formats", "decoders"]
+io = ["converters"]
+decoders = []
+
 [lib]
 name = "converter_buddy"
 path = "./src/lib.rs"
