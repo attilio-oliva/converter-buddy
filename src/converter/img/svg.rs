@@ -1,25 +1,15 @@
 use std::io::Write;
 
 use crate::{
-    converter::{ConversionError, Converter, QueueConverter},
-    format::Format,
+    converter::{ConversionError, ConverterImpl, QueueConverter, Converter},
+    format::Format
 };
 
-pub struct SvgConverter;
+pub use crate::converter_info::SvgConverter;
 
-impl Converter for SvgConverter {
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![
-            Format::Svg,
-            Format::Jpeg,
-            Format::Png,
-            Format::Tiff,
-            Format::Bmp,
-            Format::Gif,
-            Format::Pdf
-        ]
-    }
+impl Converter for SvgConverter{}
 
+impl ConverterImpl for SvgConverter {
     fn to_svg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
         Ok(())
@@ -91,7 +81,8 @@ mod tests {
     use image::codecs::png::PngDecoder;
     use image::codecs::tiff::TiffDecoder;
 
-    use crate::converter::{test_utils, Converter, SvgConverter};
+    use crate::converter::{test_utils, SvgConverter};
+    use crate::converter_info::ConverterInfo;
     use crate::decoder::PdfDecoder;
     use crate::format::Format;
 

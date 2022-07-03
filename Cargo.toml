@@ -29,9 +29,10 @@ miniz_oxide = "0.5.3"
 [features]
 default = ["formats", "converters", "io", "decoders"]
 formats = []
-converters = ["formats", "decoders"]
-io = ["converters"]
+converters = ["formats", "decoders", "converters-info"]
+io = ["converters", "converters-info"]
 decoders = []
+converters-info = ["formats"]
 
 [lib]
 name = "converter_buddy"

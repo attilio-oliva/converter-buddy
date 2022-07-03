@@ -7,8 +7,10 @@ mod utils;
 pub use error::ConversionError;
 pub use img::*;
 pub use queue::QueueConverter;
-pub use traits::Converter;
 pub use utils::*;
+
+pub use traits::{Converter, ConverterImpl};
+
 
 #[cfg(test)]
 pub mod test_utils {

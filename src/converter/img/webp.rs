@@ -2,24 +2,15 @@ use super::img_utils::*;
 use image::ImageFormat;
 
 use crate::{
-    converter::{ConversionError, Converter, QueueConverter},
-    format::Format,
+    converter::{ConversionError, ConverterImpl, QueueConverter, Converter},
+    format::Format
 };
 
-pub struct WebPConverter;
+pub use crate::converter_info::WebPConverter;
 
-impl Converter for WebPConverter {
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![
-            Format::WebP,
-            Format::Jpeg,
-            Format::Png,
-            Format::Tiff,
-            Format::Bmp,
-            Format::Gif,
-            Format::Pdf
-        ]
-    }
+impl Converter for WebPConverter{}
+
+impl ConverterImpl for WebPConverter {
 
     fn to_webp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
@@ -58,7 +49,8 @@ mod tests {
     use image::codecs::png::PngDecoder;
     use image::codecs::tiff::TiffDecoder;
 
-    use crate::converter::{test_utils, Converter, WebPConverter};
+    use crate::converter::{test_utils, WebPConverter};
+    use crate::converter_info::ConverterInfo;
     use crate::decoder::PdfDecoder;
     use crate::format::Format;
 

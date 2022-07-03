@@ -1,7 +1,8 @@
 use super::ConversionError;
-use crate::format::Format;
+use crate::{format::Format, converter_info::ConverterInfo};
 
-pub trait Converter {
+pub trait Converter: ConverterImpl + ConverterInfo{}
+pub trait ConverterImpl {
     fn process(
         &self,
         input: &Vec<u8>,
@@ -19,10 +20,6 @@ pub trait Converter {
             Format::Pdf => self.to_pdf(input, output),
             _ => Err(ConversionError::UnsupportedOperation),
         }
-    }
-
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![]
     }
 
     fn to_png(&self, _input: &Vec<u8>, _output: &mut Vec<u8>) -> Result<(), ConversionError> {

@@ -2,23 +2,15 @@ use super::img_utils::*;
 use image::ImageFormat;
 
 use crate::{
-    converter::{ConversionError, Converter, QueueConverter},
-    format::Format,
+    converter::{ConversionError, ConverterImpl, QueueConverter, Converter},
+    format::Format
 };
 
-pub struct BmpConverter;
+pub use crate::converter_info::BmpConverter;
 
-impl Converter for BmpConverter {
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![
-            Format::Bmp,
-            Format::Jpeg,
-            Format::Png,
-            Format::Tiff,
-            Format::Gif,
-            Format::Pdf
-        ]
-    }
+impl Converter for BmpConverter{}
+
+impl ConverterImpl for BmpConverter {
 
     fn to_bmp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
@@ -53,7 +45,8 @@ mod tests {
     use image::codecs::png::PngDecoder;
     use image::codecs::tiff::TiffDecoder;
 
-    use crate::converter::{test_utils, BmpConverter, Converter};
+    use crate::converter::{test_utils, BmpConverter};
+    use crate::converter_info::ConverterInfo;
     use crate::decoder::PdfDecoder;
     use crate::format::Format;
 

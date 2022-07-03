@@ -2,23 +2,15 @@ use super::img_utils::*;
 use image::ImageFormat;
 
 use crate::{
-    converter::{ConversionError, Converter, QueueConverter},
-    format::Format,
+    converter::{ConversionError, ConverterImpl, QueueConverter, Converter},
+    format::Format
 };
 
-pub struct TiffConverter;
+pub use crate::converter_info::TiffConverter;
 
-impl Converter for TiffConverter {
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![
-            Format::Tiff,
-            Format::Png,
-            Format::Jpeg,
-            Format::Bmp,
-            Format::Gif,
-            Format::Pdf
-        ]
-    }
+impl Converter for TiffConverter{}
+
+impl ConverterImpl for TiffConverter {
 
     fn to_tiff(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
@@ -53,7 +45,8 @@ mod tests {
     use image::codecs::jpeg::JpegDecoder;
     use image::codecs::png::PngDecoder;
 
-    use crate::converter::{test_utils, Converter, TiffConverter};
+    use crate::converter::{test_utils, TiffConverter};
+    use crate::converter_info::ConverterInfo;
     use crate::decoder::PdfDecoder;
     use crate::format::Format;
 

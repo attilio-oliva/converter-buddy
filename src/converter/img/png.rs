@@ -2,23 +2,14 @@ use super::img_utils::*;
 use image::{ImageFormat, Pixel};
 
 use crate::{
-    converter::{ConversionError, Converter},
-    format::Format,
+    converter::{ConversionError, ConverterImpl, Converter}
 };
 
-pub struct PngConverter;
+pub use crate::converter_info::PngConverter;
 
-impl Converter for PngConverter {
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![
-            Format::Png,
-            Format::Jpeg,
-            Format::Tiff,
-            Format::Bmp,
-            Format::Gif,
-            Format::Pdf
-        ]
-    }
+impl Converter for PngConverter{}
+
+impl ConverterImpl for PngConverter {
 
     fn to_png(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
@@ -68,7 +59,8 @@ impl Converter for PngConverter {
 
 #[cfg(test)]
 mod tests {
-    use crate::converter::{test_utils, Converter, PngConverter};
+    use crate::converter::{test_utils, PngConverter};
+    use crate::converter_info::ConverterInfo;
     use crate::decoder::PdfDecoder;
     use crate::format::Format;
     use image::codecs::bmp::BmpDecoder;

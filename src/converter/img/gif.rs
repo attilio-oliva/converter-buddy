@@ -2,23 +2,16 @@ use super::img_utils::*;
 use image::ImageFormat;
 
 use crate::{
-    converter::{ConversionError, Converter, QueueConverter},
-    format::Format,
+    converter::{ConversionError, ConverterImpl, QueueConverter, Converter},
+    format::Format
 };
 
-pub struct GifConverter;
 
-impl Converter for GifConverter {
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![
-            Format::Gif,
-            Format::Jpeg,
-            Format::Png,
-            Format::Tiff,
-            Format::Bmp,
-            Format::Pdf
-        ]
-    }
+pub use crate::converter_info::GifConverter;
+
+impl Converter for GifConverter{}
+
+impl ConverterImpl for GifConverter {
 
     fn to_gif(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
@@ -53,7 +46,8 @@ mod tests {
     use image::codecs::png::PngDecoder;
     use image::codecs::tiff::TiffDecoder;
 
-    use crate::converter::{test_utils, Converter, GifConverter};
+    use crate::converter::{test_utils, GifConverter};
+    use crate::converter_info::ConverterInfo;
     use crate::decoder::PdfDecoder;
     use crate::format::Format;
 

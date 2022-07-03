@@ -2,24 +2,15 @@ use super::img_utils::*;
 use image::ImageFormat;
 
 use crate::{
-    converter::{ConversionError, Converter},
-    format::Format,
+    converter::{ConversionError, ConverterImpl, Converter}
 };
 
-pub struct JpegConverter;
 
-impl Converter for JpegConverter {
-    fn supported_formats(&self) -> Vec<Format> {
-        vec![
-            Format::Jpeg,
-            Format::Png,
-            Format::Tiff,
-            Format::Bmp,
-            Format::Gif,
-            Format::Pdf
-        ]
-    }
+pub use crate::converter_info::JpegConverter;
 
+impl Converter for JpegConverter{}
+
+impl ConverterImpl for JpegConverter {
     fn to_jpeg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
         Ok(())
@@ -55,7 +46,8 @@ mod tests {
     use image::codecs::png::PngDecoder;
     use image::codecs::tiff::TiffDecoder;
 
-    use crate::converter::{test_utils, Converter, JpegConverter};
+    use crate::converter::{test_utils, JpegConverter};
+    use crate::converter_info::ConverterInfo;
     use crate::decoder::PdfDecoder;
     use crate::format::Format;
 
