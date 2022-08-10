@@ -1,4 +1,4 @@
-use crate::{format::Format};
+use crate::format::Format;
 
 use super::*;
 
@@ -12,5 +12,5 @@ pub fn from_format(format: Format) -> Box<dyn ConverterInfo> {
         Format::WebP => Box::new(WebPConverter),
         Format::Svg => Box::new(SvgConverter),
         _ => panic!("Unsupported format"),
-    } 
+    }
 }

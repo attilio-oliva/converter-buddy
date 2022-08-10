@@ -1,10 +1,8 @@
-use crate::{
-    format::Format, converter_info::ConverterInfo,
-};
+use crate::{converter_info::ConverterInfo, format::Format};
 
 pub struct WebPConverter;
 
-impl ConverterInfo for WebPConverter{
+impl ConverterInfo for WebPConverter {
     fn supported_formats(&self) -> Vec<Format> {
         vec![
             Format::WebP,
@@ -13,7 +11,7 @@ impl ConverterInfo for WebPConverter{
             Format::Tiff,
             Format::Bmp,
             Format::Gif,
-            Format::Pdf
+            Format::Pdf,
         ]
     }
 }

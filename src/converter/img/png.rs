@@ -1,16 +1,13 @@
 use super::img_utils::*;
 use image::{ImageFormat, Pixel};
 
-use crate::{
-    converter::{ConversionError, ConverterImpl, Converter}
-};
+use crate::converter::{ConversionError, Converter, ConverterImpl};
 
 pub use crate::converter_info::PngConverter;
 
-impl Converter for PngConverter{}
+impl Converter for PngConverter {}
 
 impl ConverterImpl for PngConverter {
-
     fn to_png(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
         Ok(())
@@ -52,7 +49,9 @@ impl ConverterImpl for PngConverter {
         wrapper::image_crate_conversion(input, output, ImageFormat::Gif)
     }
     fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        output.clone_from(&wrapper::pdfwriter_image_to_pdf(input).map_err(|_| ConversionError::Unexpected)?);
+        output.clone_from(
+            &wrapper::pdfwriter_image_to_pdf(input).map_err(|_| ConversionError::Unexpected)?,
+        );
         Ok(())
     }
 }
@@ -168,7 +167,7 @@ mod tests {
             },
         );
     }
-    
+
     #[test]
     fn test_to_pdf() {
         let target_ext = "pdf";
@@ -178,9 +177,7 @@ mod tests {
             &CONVERTER,
             SOURCE_EXT,
             target_ext,
-            |_, target| {
-                PdfDecoder::check(&target)
-            },
+            |_, target| PdfDecoder::check(&target),
         );
     }
 }

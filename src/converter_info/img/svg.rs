@@ -1,9 +1,8 @@
 use crate::{converter_info::ConverterInfo, format::Format};
 
-
 pub struct SvgConverter;
 
-impl ConverterInfo for SvgConverter{
+impl ConverterInfo for SvgConverter {
     fn supported_formats(&self) -> Vec<Format> {
         vec![
             Format::Svg,
@@ -12,7 +11,7 @@ impl ConverterInfo for SvgConverter{
             Format::Tiff,
             Format::Bmp,
             Format::Gif,
-            Format::Pdf
+            Format::Pdf,
         ]
     }
 }

@@ -1,13 +1,13 @@
 use std::io::Write;
 
 use crate::{
-    converter::{ConversionError, ConverterImpl, QueueConverter, Converter},
-    format::Format
+    converter::{ConversionError, Converter, ConverterImpl, QueueConverter},
+    format::Format,
 };
 
 pub use crate::converter_info::SvgConverter;
 
-impl Converter for SvgConverter{}
+impl Converter for SvgConverter {}
 
 impl ConverterImpl for SvgConverter {
     fn to_svg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
@@ -69,7 +69,6 @@ impl ConverterImpl for SvgConverter {
 
         converter.process(input, output, Format::Svg)
     }
-
 }
 
 #[cfg(test)]
@@ -212,9 +211,7 @@ mod tests {
             &CONVERTER,
             SOURCE_EXT,
             target_ext,
-            |_, target| {
-                PdfDecoder::check(&target)
-            },
+            |_, target| PdfDecoder::check(&target),
         );
     }
 }

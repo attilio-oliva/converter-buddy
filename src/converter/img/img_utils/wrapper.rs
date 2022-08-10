@@ -1,22 +1,21 @@
 use std::io::Cursor;
 
-use image::{io::Reader as ImageReader, DynamicImage, ImageFormat, ImageError, ColorType, GenericImageView};
-use pdf_writer::{PdfWriter, Ref, Name, Rect, Finish, Filter, Content};
+use image::{
+    io::Reader as ImageReader, ColorType, DynamicImage, GenericImageView, ImageError, ImageFormat,
+};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
+use pdf_writer::{Content, Filter, Finish, Name, PdfWriter, Rect, Ref};
 
 use crate::converter::ConversionError;
 
 /// use image crate to read an image from a buffer
-pub fn image_crate_read(
-    input: &Vec<u8>,
-) -> Result<DynamicImage,  ImageError> {
+pub fn image_crate_read(input: &Vec<u8>) -> Result<DynamicImage, ImageError> {
     let reader = ImageReader::new(Cursor::new(input))
         .with_guessed_format()
         .expect("Cursor io never fails");
 
     reader.decode()
 }
-
 
 /// Use image crate for the conversion
 pub fn image_crate_conversion(
@@ -35,8 +34,7 @@ pub fn image_crate_conversion_with_processing(
     target_format: ImageFormat,
     processing: &dyn Fn(&DynamicImage) -> Result<DynamicImage, ConversionError>,
 ) -> Result<(), ConversionError> {
-    let mut image = image_crate_read(input)
-        .map_err(|_| ConversionError::UnknownSourceFormat)?;
+    let mut image = image_crate_read(input).map_err(|_| ConversionError::UnknownSourceFormat)?;
 
     image = processing(&mut image)?;
 
@@ -45,9 +43,7 @@ pub fn image_crate_conversion_with_processing(
         .map_err(|_| ConversionError::Unexpected)
 }
 
-pub fn pdfwriter_image_to_pdf(
-    input: &Vec<u8>,
-) -> Result<Vec<u8>, ImageError> {
+pub fn pdfwriter_image_to_pdf(input: &Vec<u8>) -> Result<Vec<u8>, ImageError> {
     let mut writer = PdfWriter::new();
     // From the pdf_writer crate example:
 
