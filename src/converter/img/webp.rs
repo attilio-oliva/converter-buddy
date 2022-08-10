@@ -2,16 +2,15 @@ use super::img_utils::*;
 use image::ImageFormat;
 
 use crate::{
-    converter::{ConversionError, ConverterImpl, QueueConverter, Converter},
-    format::Format
+    converter::{ConversionError, Converter, ConverterImpl, QueueConverter},
+    format::Format,
 };
 
 pub use crate::converter_info::WebPConverter;
 
-impl Converter for WebPConverter{}
+impl Converter for WebPConverter {}
 
 impl ConverterImpl for WebPConverter {
-
     fn to_webp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(input);
         Ok(())
@@ -181,9 +180,7 @@ mod tests {
             &CONVERTER,
             SOURCE_EXT,
             target_ext,
-            |_, target| {
-                PdfDecoder::check(&target)
-            },
+            |_, target| PdfDecoder::check(&target),
         );
     }
 }

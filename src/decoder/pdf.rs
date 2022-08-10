@@ -8,7 +8,7 @@ impl PdfDecoder {
     }
 
     pub fn check(file: &File) -> bool {
-        let mut signature: [u8;4] = [0;4];
+        let mut signature: [u8; 4] = [0; 4];
         <&File>::clone(&file).read_exact(&mut signature).unwrap();
         Self::check_magic_bytes(&signature)
     }

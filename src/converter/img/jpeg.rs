@@ -1,14 +1,11 @@
 use super::img_utils::*;
 use image::ImageFormat;
 
-use crate::{
-    converter::{ConversionError, ConverterImpl, Converter}
-};
-
+use crate::converter::{ConversionError, Converter, ConverterImpl};
 
 pub use crate::converter_info::JpegConverter;
 
-impl Converter for JpegConverter{}
+impl Converter for JpegConverter {}
 
 impl ConverterImpl for JpegConverter {
     fn to_jpeg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
@@ -34,7 +31,9 @@ impl ConverterImpl for JpegConverter {
         wrapper::image_crate_conversion(input, output, ImageFormat::Gif)
     }
     fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        output.clone_from(&wrapper::pdfwriter_image_to_pdf(input).map_err(|_| ConversionError::Unexpected)?);
+        output.clone_from(
+            &wrapper::pdfwriter_image_to_pdf(input).map_err(|_| ConversionError::Unexpected)?,
+        );
         Ok(())
     }
 }
@@ -160,9 +159,7 @@ mod tests {
             &CONVERTER,
             SOURCE_EXT,
             target_ext,
-            |_, target| {
-                PdfDecoder::check(&target)
-            },
+            |_, target| PdfDecoder::check(&target),
         );
     }
 }

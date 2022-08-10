@@ -1,7 +1,7 @@
 use super::ConversionError;
-use crate::{format::Format, converter_info::ConverterInfo};
+use crate::{converter_info::ConverterInfo, format::Format};
 
-pub trait Converter: ConverterImpl + ConverterInfo{}
+pub trait Converter: ConverterImpl + ConverterInfo {}
 pub trait ConverterImpl {
     fn process(
         &self,

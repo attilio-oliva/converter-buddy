@@ -1,9 +1,7 @@
-use crate::{
-    format::Format, converter_info::ConverterInfo,
-};
+use crate::{converter_info::ConverterInfo, format::Format};
 pub struct TiffConverter;
 
-impl ConverterInfo for TiffConverter{
+impl ConverterInfo for TiffConverter {
     fn supported_formats(&self) -> Vec<Format> {
         vec![
             Format::Tiff,
@@ -11,7 +9,7 @@ impl ConverterInfo for TiffConverter{
             Format::Jpeg,
             Format::Bmp,
             Format::Gif,
-            Format::Pdf
+            Format::Pdf,
         ]
     }
 }

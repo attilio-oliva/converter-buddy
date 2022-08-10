@@ -1,10 +1,8 @@
-use crate::{
-    format::Format, converter_info::ConverterInfo,
-};
+use crate::{converter_info::ConverterInfo, format::Format};
 
 pub struct BmpConverter;
 
-impl ConverterInfo for BmpConverter{
+impl ConverterInfo for BmpConverter {
     fn supported_formats(&self) -> Vec<Format> {
         vec![
             Format::Bmp,
@@ -12,7 +10,7 @@ impl ConverterInfo for BmpConverter{
             Format::Png,
             Format::Tiff,
             Format::Gif,
-            Format::Pdf
+            Format::Pdf,
         ]
     }
 }

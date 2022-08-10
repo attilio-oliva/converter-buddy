@@ -11,7 +11,6 @@ pub use utils::*;
 
 pub use traits::{Converter, ConverterImpl};
 
-
 #[cfg(test)]
 pub mod test_utils {
     use std::{
