@@ -146,19 +146,18 @@ pub fn pdfwriter_image_to_pdf(input: &Vec<u8>) -> Result<Vec<u8>, ImageError> {
     // Size the image at 1pt per pixel.
     let image_width = dynamic.width() as f32;
     let image_height = dynamic.height() as f32;
-    
+
     // Auto fit image to a4 paper
     let image_aspect_ratio = image_width / image_height;
     let screen_aspect_ratio = a4.x2 / a4.y2;
 
     let w;
     let h;
-    
+
     if screen_aspect_ratio > image_aspect_ratio {
-        w = image_width * a4.y2/image_height;
+        w = image_width * a4.y2 / image_height;
         h = image_height;
-    }
-    else {
+    } else {
         w = image_width;
         h = image_height;
     }
