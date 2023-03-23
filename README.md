@@ -23,7 +23,7 @@ match file.convert(target_format) {
 }
 ```
 
-You can use the underneath converters if you don't want to use std::fs, but pure data:
+You can use the underneath converters if you don't want to use bytes vectors instead of std::fs:
 ```rust
 fn get_input_data() -> Vec<u8> {
     ...
@@ -33,7 +33,7 @@ fn main() {
     let input = get_input_data();
     let mut output = Vec::<u8>::new();
 
-    PngConverter.to_jpeg(&input, &mut output).expect("Conversion error");
+    PngConverter.process(&input, &mut output, Format::Jpeg).expect("Conversion error");
     
     // or in a more generic way
     let source_format = Format::Png;
