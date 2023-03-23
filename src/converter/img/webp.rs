@@ -11,25 +11,23 @@ pub use crate::converter_info::WebPConverter;
 impl Converter for WebPConverter {}
 
 impl ConverterImpl for WebPConverter {
-    fn to_webp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        output.clone_from(input);
-        Ok(())
+    fn process(
+        &self,
+        input: &Vec<u8>,
+        output: &mut Vec<u8>,
+        target_format: Format,
+    ) -> Result<(), ConversionError> {
+        match target_format {
+            Format::WebP=> self.to_same_format(input, output),
+            Format::Tiff | Format::Png | Format::Jpeg | Format::Bmp | Format::Gif=> {
+                wrapper::image_crate_conversion(input, output, target_format.into())
+            }
+            Format::Pdf => self.to_pdf(input, output),
+            _ => Err(ConversionError::UnsupportedOperation),
+        }
     }
-    fn to_bmp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Bmp)
-    }
-    fn to_tiff(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Tiff)
-    }
-    fn to_png(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Png)
-    }
-    fn to_jpeg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Jpeg)
-    }
-    fn to_gif(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Gif)
-    }
+}
+impl WebPConverter {
     fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         let mut converter = QueueConverter::new();
         converter.push(Format::Png);

@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use crate::{
     converter::{ConversionError, Converter, ConverterImpl, QueueConverter},
     format::Format,
@@ -10,62 +8,31 @@ pub use crate::converter_info::SvgConverter;
 impl Converter for SvgConverter {}
 
 impl ConverterImpl for SvgConverter {
-    fn to_svg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        output.clone_from(input);
-        Ok(())
+    fn process(
+        &self,
+        input: &Vec<u8>,
+        output: &mut Vec<u8>,
+        target_format: Format,
+    ) -> Result<(), ConversionError> {
+        match target_format {
+            Format::Svg => self.to_same_format(input, output),
+            Format::Tiff | Format::Png | Format::Jpeg | Format::Bmp | Format::Gif | Format::Pdf => {
+                SvgConverter::to_raster_format(input, output, target_format)
+            }
+            _ => Err(ConversionError::UnsupportedOperation),
+        }
     }
-    fn to_bmp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
+}
+
+impl SvgConverter {
+    fn to_raster_format(
+        input: &Vec<u8>,
+        output: &mut Vec<u8>,
+        target_format: Format,
+    ) -> Result<(), ConversionError> {
         let mut converter = QueueConverter::new();
         converter.push(Format::Png);
-        converter.push(Format::Bmp);
-
-        converter.process(input, output, Format::Svg)
-    }
-    fn to_tiff(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        let mut converter = QueueConverter::new();
-        converter.push(Format::Png);
-        converter.push(Format::Tiff);
-
-        converter.process(input, output, Format::Svg)
-    }
-    fn to_png(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        let mut opt = usvg::Options::default();
-        opt.fontdb.load_system_fonts();
-
-        let tree = usvg::Tree::from_data(input, &opt.to_ref()).unwrap();
-        let pixmap_size = tree.svg_node().size.to_screen_size();
-        let mut pixmap = tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
-        resvg::render(
-            &tree,
-            usvg::FitTo::Original,
-            tiny_skia::Transform::default(),
-            pixmap.as_mut(),
-        )
-        .unwrap();
-
-        output
-            .write_all(pixmap.encode_png().unwrap().as_slice())
-            .expect("Failed to write to output");
-        Ok(())
-    }
-    fn to_jpeg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        let mut converter = QueueConverter::new();
-        converter.push(Format::Png);
-        converter.push(Format::Jpeg);
-
-        converter.process(input, output, Format::Svg)
-    }
-    fn to_gif(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        let mut converter = QueueConverter::new();
-        converter.push(Format::Png);
-        converter.push(Format::Gif);
-
-        converter.process(input, output, Format::Svg)
-    }
-    fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        let mut converter = QueueConverter::new();
-        converter.push(Format::Jpeg);
-        converter.push(Format::Pdf);
+        converter.push(target_format);
 
         converter.process(input, output, Format::Svg)
     }
