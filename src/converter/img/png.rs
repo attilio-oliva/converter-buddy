@@ -1,53 +1,58 @@
 use super::img_utils::*;
-use image::{ImageFormat, Pixel};
+use image::{DynamicImage, ImageFormat, Pixel};
 
-use crate::converter::{ConversionError, Converter, ConverterImpl};
+use crate::{
+    converter::{ConversionError, Converter, ConverterImpl},
+    format::Format,
+};
 
 pub use crate::converter_info::PngConverter;
 
 impl Converter for PngConverter {}
 
 impl ConverterImpl for PngConverter {
-    fn to_png(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        output.clone_from(input);
-        Ok(())
+    fn process(
+        &self,
+        input: &Vec<u8>,
+        output: &mut Vec<u8>,
+        target_format: Format,
+    ) -> Result<(), ConversionError> {
+        match target_format {
+            Format::Png => self.to_same_format(input, output),
+            Format::Tiff | Format::Gif | Format::Jpeg | Format::Bmp => {
+                wrapper::image_crate_conversion_with_processing(
+                    input,
+                    output,
+                    target_format.into(),
+                    &|image| PngConverter::tranparent_to_color(image),
+                )
+            }
+            Format::Pdf => self.to_pdf(input, output),
+            _ => Err(ConversionError::UnsupportedOperation),
+        }
     }
-    fn to_jpeg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion_with_processing(
-            input,
-            output,
-            ImageFormat::Jpeg,
-            &|image| {
-                // Decide a color to replace transparent pixels with
-                // TODO: Make this configurable
-                // TODO: Make this support higher color depth than 8-bit (Rgb<u8>)
-                // TODO: Add anti-aliasing
-                let avg_color = processing::average_image_color(image);
-                let white_color = image::Rgb([255, 255, 255]);
-                let black_color = image::Rgb([0, 0, 0]);
-                //info!("Average color: {:?}", avg_color);
-                let background_color =
-                    if processing::contrast_ratio(&avg_color, &white_color) >= 1.5 {
-                        white_color
-                    } else {
-                        black_color
-                    };
-                Ok(processing::map_image_transparent_color(
-                    image,
-                    &background_color.to_rgba(),
-                ))
-            },
-        )
+}
+impl PngConverter {
+    fn tranparent_to_color(image: &DynamicImage) -> Result<DynamicImage, ConversionError> {
+        // Decide a color to replace transparent pixels with
+        // TODO: Make this configurable
+        // TODO: Make this support higher color depth than 8-bit (Rgb<u8>)
+        // TODO: Add anti-aliasing
+        let avg_color = processing::average_image_color(image);
+        let white_color = image::Rgb([255, 255, 255]);
+        let black_color = image::Rgb([0, 0, 0]);
+        //info!("Average color: {:?}", avg_color);
+        let background_color = if processing::contrast_ratio(&avg_color, &white_color) >= 1.5 {
+            white_color
+        } else {
+            black_color
+        };
+        Ok(processing::map_image_transparent_color(
+            image,
+            &background_color.to_rgba(),
+        ))
     }
-    fn to_tiff(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Tiff)
-    }
-    fn to_bmp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Bmp)
-    }
-    fn to_gif(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Gif)
-    }
+
     fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(
             &wrapper::pdfwriter_image_to_pdf(input).map_err(|_| ConversionError::Unexpected)?,

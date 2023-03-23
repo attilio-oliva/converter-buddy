@@ -1,35 +1,34 @@
 use super::img_utils::*;
 use image::ImageFormat;
 
-use crate::converter::{ConversionError, Converter, ConverterImpl};
+use crate::{
+    converter::{ConversionError, Converter, ConverterImpl},
+    format::Format,
+};
 
 pub use crate::converter_info::JpegConverter;
 
 impl Converter for JpegConverter {}
 
 impl ConverterImpl for JpegConverter {
-    fn to_jpeg(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        output.clone_from(input);
-        Ok(())
+    fn process(
+        &self,
+        input: &Vec<u8>,
+        output: &mut Vec<u8>,
+        target_format: Format,
+    ) -> Result<(), ConversionError> {
+        match target_format {
+            Format::Jpeg => self.to_same_format(input, output),
+            Format::Tiff | Format::Png | Format::Gif | Format::Bmp => {
+                wrapper::image_crate_conversion(input, output, target_format.into())
+            }
+            Format::Pdf => self.to_pdf(input, output),
+            _ => Err(ConversionError::UnsupportedOperation),
+        }
     }
-    fn to_png(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        //TODO: Process image
-        //      Add advanced configurable options
-        //      - jpeg compression
-        //      - jpeg subsampling
-        //      - possibility to replace the background color with a transparent one
+}
 
-        wrapper::image_crate_conversion(input, output, ImageFormat::Png)
-    }
-    fn to_tiff(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Tiff)
-    }
-    fn to_bmp(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Bmp)
-    }
-    fn to_gif(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        wrapper::image_crate_conversion(input, output, ImageFormat::Gif)
-    }
+impl JpegConverter {
     fn to_pdf(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
         output.clone_from(
             &wrapper::pdfwriter_image_to_pdf(input).map_err(|_| ConversionError::Unexpected)?,
