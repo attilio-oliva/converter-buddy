@@ -1,18 +1,19 @@
 use super::ConversionError;
-use crate::{converter_info::ConverterInfo, format::Format};
+use crate::format::Format;
 
-pub trait Converter: ConverterImpl + ConverterInfo {}
-pub trait ConverterImpl {
+pub trait ConversionStrategy<F> {
     fn process(
         &self,
         _input: &Vec<u8>,
         _output: &mut Vec<u8>,
-        _target_format: Format,
+        _config: F,
     ) -> Result<(), ConversionError> {
         Err(ConversionError::UnsupportedOperation)
     }
+}
 
-    fn to_same_format(&self, input: &Vec<u8>, output: &mut Vec<u8>) -> Result<(), ConversionError> {
-        Ok(output.clone_from(input))
+pub trait ConverterInfo {
+    fn supported_formats(&self) -> Vec<Format> {
+        vec![]
     }
 }

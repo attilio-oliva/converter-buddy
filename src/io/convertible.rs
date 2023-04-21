@@ -1,10 +1,10 @@
 use once_cell::sync::OnceCell;
 use std::fs::File;
 use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use super::DecodingError;
-use crate::converter::{from_format, ConversionError};
+use crate::converter::{ConversionError, Converter};
 use crate::{format, format::Format};
 
 /// Utility struct to convert a file from one format to another using std::fs::File.
@@ -21,7 +21,7 @@ impl ConvertibleFile {
         }
     }
 
-    fn guess_format(path: &PathBuf) -> Result<Format, DecodingError> {
+    fn guess_format(path: &Path) -> Result<Format, DecodingError> {
         path.extension()
             .and_then(|ext| ext.to_str())
             .and_then(format::from_extension)
@@ -51,8 +51,8 @@ impl ConvertibleFile {
             .read_to_end(&mut input_buffer)
             .map_err(ConversionError::IoError)?;
 
-        let converter = from_format(source_format);
-        converter.process(&input_buffer, &mut output_buffer, target_format)?;
+        let converter = Converter::try_from(source_format)?;
+        converter.process(&input_buffer, &mut output_buffer, target_format.try_into()?)?;
 
         target_file
             .write_all(&output_buffer)

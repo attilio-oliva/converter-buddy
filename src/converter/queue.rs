@@ -1,22 +1,20 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, io::Write};
 
-use crate::{converter::from_format, format::Format};
+use crate::{config::Config, format::Format};
 
-use super::ConversionError;
+use super::{ConversionError, Converter};
 
-#[derive(Default)]
 pub struct QueueConverter {
     queue: VecDeque<Format>,
+    source_format: Format,
 }
 
 impl QueueConverter {
-    pub fn new() -> Self {
+    pub fn new(source_format: Format) -> Self {
         Self {
             queue: VecDeque::default(),
+            source_format,
         }
-    }
-    pub fn with_queue(queue: VecDeque<Format>) -> Self {
-        Self { queue }
     }
     pub fn push(&mut self, format: Format) {
         self.queue.push_back(format);
@@ -30,30 +28,38 @@ impl QueueConverter {
         &mut self,
         input: &Vec<u8>,
         output: &mut Vec<u8>,
-        source_format: Format,
+        target_config: Config,
     ) -> Result<(), ConversionError> {
-        let mut source_format = source_format.clone();
-
-        let mut current_input = input.to_owned();
-
+        let mut source_format = self.source_format;
+        let mut current_input = input.clone();
+        let mut current_output = Vec::<u8>::new();
+        let total_steps = self.queue.len();
         // The default VecDeque behavior is to operate as a queue, so the iterable should follow a FIFO order
-        for target_format in self.queue.iter() {
-            let converter = from_format(source_format.clone());
+        for (step, current_target_format) in self.queue.iter().enumerate() {
+            let converter = Converter::try_from(source_format)?;
+            let config = if step + 1 != total_steps {
+                Config::try_from(*current_target_format)?
+            } else {
+                target_config.clone()
+            };
+            current_output = vec![];
             //info!("Converting from {:?} to {:?}, with {:?}", source_format, target_format, converter.supported_formats());
             converter
-                .process(&current_input, output, *target_format)
+                .process(&current_input, &mut current_output, config)
                 .map_err(|e| {
                     ConversionError::IndirectConversionFailure(
                         source_format,
-                        *target_format,
+                        *current_target_format,
                         Box::new(e),
                     )
                 })?;
             //info!("Converted from {:?} to {:?}", source_format, target_format);
-            source_format = *target_format;
-            current_input = output.clone();
+            source_format = *current_target_format;
+            current_input = current_output.clone();
         }
-        Ok(())
+        output
+            .write_all(&mut current_output)
+            .map_err(ConversionError::IoError)
     }
 }
 
@@ -62,7 +68,7 @@ mod tests {
     use image::codecs::tiff::TiffDecoder;
 
     #[test]
-    fn test_queue_converter() {
+    fn queued_conversion() {
         use super::*;
         use crate::format::Format;
         use std::{
@@ -72,10 +78,12 @@ mod tests {
         };
 
         let source_format = Format::Jpeg;
+        let intermediate_format = Format::Png;
+        let target_format = Format::Tiff;
 
-        let mut queue_converter = QueueConverter::new();
-        queue_converter.push(Format::Png);
-        queue_converter.push(Format::Tiff);
+        let mut queue_converter = QueueConverter::new(source_format);
+        queue_converter.push(intermediate_format);
+        queue_converter.push(target_format);
 
         let source_path = PathBuf::from("./tests/assets/test.jpg");
         let target_path = PathBuf::from("/tmp/test_jpeg_to_png_to_tiff.tiff");
@@ -88,7 +96,8 @@ mod tests {
 
         source_file.read_to_end(&mut input).unwrap();
 
-        let conversion_operation = queue_converter.process(&input, &mut output, source_format);
+        let conversion_operation =
+            queue_converter.process(&input, &mut output, target_format.try_into().unwrap());
         assert!(conversion_operation.is_ok());
 
         target_file.write_all(&output).unwrap();

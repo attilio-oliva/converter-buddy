@@ -11,5 +11,5 @@ pub mod info;
 mod interop;
 mod utils;
 
-pub use enumerator::Format;
+pub use enumerator::*;
 pub use utils::*;
