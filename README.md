@@ -23,7 +23,7 @@ match file.convert(target_format) {
 }
 ```
 
-You can use the underneath converters if you don't want to use bytes vectors instead of std::fs:
+You can use the underneath converters if you want to use bytes vectors instead of std::fs primitives:
 ```rust
 fn get_input_data() -> Vec<u8> {
     ...
@@ -33,14 +33,14 @@ fn main() {
     let input = get_input_data();
     let mut output = Vec::<u8>::new();
 
-    PngConverter.process(&input, &mut output, Format::Jpeg).expect("Conversion error");
+    PngConverter.process(&input, &mut output, JpegConfig::default()).expect("Conversion error");
     
     // or in a more generic way
     let source_format = Format::Png;
     let target_format = Format::Jpeg;
 
-    let converter = converter::from_format(source_format);
-    converter.process(&input, &mut output, target_format).expect("Conversion error");
+    let converter = Converter::try_from(source_format).expect("This format cannot be converted");
+    converter.process(&input, &mut output, target_format.into()).expect("Conversion error");
 
     // use output ...
 }
@@ -48,12 +48,12 @@ fn main() {
 
 ## Compatibility
 
-| From\To | PNG                | JPEG               | BMP                | TIFF               | GIF                | SVG                | WEBP               | PDF                |
-|---------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|
-| PNG     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x:                | :x:                | :heavy_check_mark: |
-| JPEG    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x:                | :x:                | :heavy_check_mark: |
-| BMP     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x:                | :x:                | :heavy_check_mark: |
-| TIFF    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x:                | :x:                | :heavy_check_mark: |
-| GIF     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x:                | :x:                | :heavy_check_mark: |
-| SVG     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x:                | :heavy_check_mark: |
-| WEBP    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| From\To | PNG | JPEG | BMP | TIFF | GIF | SVG | WEBP | PDF |
+|---------|-----|------|-----|------|-----|-----|------|-----|
+| PNG     | ✔   | ✔    | ✔   | ✔    | ✔   | ✖   | ✖    | ✔   |
+| JPEG    | ✔   | ✔    | ✔   | ✔    | ✔   | ✖   | ✖    | ✔   |
+| BMP     | ✔   | ✔    | ✔   | ✔    | ✔   | ✖   | ✖    | ✔   |
+| TIFF    | ✔   | ✔    | ✔   | ✔    | ✔   | ✖   | ✖    | ✔   |
+| GIF     | ✔   | ✔    | ✔   | ✔    | ✔   | ✖   | ✖    | ✔   |
+| SVG     | ✔   | ✔    | ✔   | ✔    | ✔   | ✔   | ✖    | ✔   |
+| WEBP    | ✔   | ✔    | ✔   | ✔    | ✔   | ✔   | ✔    | ✔   |
