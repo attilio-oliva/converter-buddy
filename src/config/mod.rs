@@ -77,6 +77,7 @@ pub enum Config {
     Svg(SvgConfig),
     Pdf(PdfConfig),
 }
+// TODO: create macro to implement all the convertions from this line
 
 impl TryFrom<Format> for Config {
     type Error = ConversionError;
@@ -109,6 +110,7 @@ impl From<Config> for Format {
     }
 }
 
+// inner config structure conversions to Config enum
 impl From<JpegConfig> for Config {
     fn from(value: JpegConfig) -> Self {
         Config::Jpeg(value)
@@ -134,7 +136,6 @@ impl From<BmpConfig> for Config {
         Config::Bmp(value)
     }
 }
-
 impl From<TiffConfig> for Config {
     fn from(value: TiffConfig) -> Self {
         Config::Tiff(value)
@@ -150,5 +151,42 @@ impl From<WebPConfig> for Config {
 impl From<SvgConfig> for Config {
     fn from(value: SvgConfig) -> Self {
         Config::Svg(value)
+    }
+}
+
+// inner config structure to format it refers to
+impl From<JpegConfig> for Format {
+    fn from(_value: JpegConfig) -> Self {
+        Format::Jpeg
+    }
+}
+impl From<PngConfig> for Format {
+    fn from(_value: PngConfig) -> Self {
+        Format::Png
+    }
+}
+impl From<TiffConfig> for Format {
+    fn from(_value: TiffConfig) -> Self {
+        Format::Tiff
+    }
+}
+impl From<SvgConfig> for Format {
+    fn from(_value: SvgConfig) -> Self {
+        Format::Svg
+    }
+}
+impl From<WebPConfig> for Format {
+    fn from(_value: WebPConfig) -> Self {
+        Format::WebP
+    }
+}
+impl From<GifConfig> for Format {
+    fn from(_value: GifConfig) -> Self {
+        Format::Gif
+    }
+}
+impl From<PdfConfig> for Format {
+    fn from(_value: PdfConfig) -> Self {
+        Format::Pdf
     }
 }
