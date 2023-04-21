@@ -1,5 +1,4 @@
-use std::io::Cursor;
-
+use image::imageops::FilterType;
 use image::{
     error::{ImageFormatHint, UnsupportedError, UnsupportedErrorKind},
     io::Reader as ImageReader,
@@ -7,11 +6,13 @@ use image::{
 };
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Content, Filter, Finish, Name, PdfWriter, Rect, Ref};
+use std::io::Cursor;
 
-use crate::converter::ConversionError;
+use crate::config::SizeSetting;
+use crate::{config::ImageConfig, converter::ConversionError};
 
 /// use image crate to read an image from a buffer
-pub fn image_crate_read(input: &Vec<u8>) -> Result<DynamicImage, ImageError> {
+pub fn image_crate_read(input: &[u8]) -> Result<DynamicImage, ImageError> {
     let reader = ImageReader::new(Cursor::new(input))
         .with_guessed_format()
         .expect("Cursor io never fails");
@@ -19,31 +20,49 @@ pub fn image_crate_read(input: &Vec<u8>) -> Result<DynamicImage, ImageError> {
     reader.decode()
 }
 
-/// Use image crate for the conversion
+/// Use image crate for the conversion with the provided configuration  
 pub fn image_crate_conversion(
-    input: &Vec<u8>,
+    input: &[u8],
     output: &mut Vec<u8>,
+    config: &ImageConfig,
     target_format: ImageFormat,
-) -> Result<(), ConversionError> {
-    image_crate_conversion_with_processing(input, output, target_format, &|img| Ok(img.to_owned()))
+) -> Result<DynamicImage, ConversionError> {
+    image_crate_conversion_with_processing(input, output, config, target_format, Ok)
 }
 
 /// Use image crate for the conversion and apply a processing function
 /// to the image before writing it to the output
-pub fn image_crate_conversion_with_processing(
-    input: &Vec<u8>,
-    output: &mut Vec<u8>,
-    target_format: ImageFormat,
-    processing: &dyn Fn(&DynamicImage) -> Result<DynamicImage, ConversionError>,
-) -> Result<(), ConversionError> {
-    let mut image = image_crate_read(input).map_err(|_| ConversionError::UnknownSourceFormat)?;
+pub fn image_crate_conversion_with_processing<F>(
+    input: &[u8],
+    _output: &mut Vec<u8>,
+    config: &ImageConfig,
+    _target_format: ImageFormat,
+    processing: F,
+) -> Result<DynamicImage, ConversionError>
+where
+    F: Fn(DynamicImage) -> Result<DynamicImage, ConversionError>,
+{
+    let image = image_crate_read(input).map_err(|_| ConversionError::UnknownSourceFormat)?;
 
-    image = processing(&mut image)?;
+    let image = processing(image)?;
+    let image = image_crate_apply_config(&image, config);
 
-    image
-        .write_to(&mut Cursor::new(output), target_format)
-        .map_err(|_| ConversionError::Unexpected)
+    Ok(image)
 }
+fn image_crate_apply_config(image: &DynamicImage, config: &ImageConfig) -> DynamicImage {
+    let size = config.size.unwrap_or(SizeSetting {
+        width: image.dimensions().0,
+        height: image.dimensions().1,
+    });
+    let filter_type = config.filter;
+    image.resize(
+        size.width,
+        size.height,
+        filter_type.unwrap_or(FilterType::Nearest),
+    )
+}
+
+fn image_crate_apply_config_operations(_image: &DynamicImage, _config: &ImageConfig) {}
 
 pub fn pdfwriter_image_to_pdf(input: &Vec<u8>) -> Result<Vec<u8>, ImageError> {
     let mut writer = PdfWriter::new();
@@ -73,8 +92,8 @@ pub fn pdfwriter_image_to_pdf(input: &Vec<u8>) -> Result<Vec<u8>, ImageError> {
     page.finish();
 
     // Decode the image.
-    let format = image::guess_format(&input).unwrap();
-    let dynamic = image::load_from_memory(&input).unwrap();
+    let format = image::guess_format(input).unwrap();
+    let dynamic = image::load_from_memory(input).unwrap();
 
     // Now, there are multiple considerations:
     // - Writing an XObject with just the raw samples would work, but lead to
@@ -135,7 +154,7 @@ pub fn pdfwriter_image_to_pdf(input: &Vec<u8>) -> Result<Vec<u8>, ImageError> {
 
     // Add SMask if the image has transparency.
     if let Some(encoded) = &mask {
-        let mut s_mask = writer.image_xobject(s_mask_id, &encoded);
+        let mut s_mask = writer.image_xobject(s_mask_id, encoded);
         s_mask.filter(filter);
         s_mask.width(dynamic.width() as i32);
         s_mask.height(dynamic.height() as i32);

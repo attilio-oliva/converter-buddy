@@ -1,10 +1,9 @@
+//TODO: rework the API, because clippy is right on this. For the moment ignore the warning.
+#![allow(clippy::ptr_arg)]
+
+pub mod config;
 #[cfg(feature = "converters")]
 pub mod converter;
-
-#[cfg(feature = "converters-info")]
-pub mod converter_info;
-
-#[cfg(feature = "formats")]
 pub mod format;
 
 #[cfg(feature = "io")]
