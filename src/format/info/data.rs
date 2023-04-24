@@ -2,10 +2,6 @@ use super::FormatInfo;
 use crate::format::Format;
 use once_cell::sync::Lazy;
 
-pub static LIST: &[&Lazy<FormatInfo>] = &[
-    &PNG, &JPEG, &GIF, &WEBP, &PNM, &TIFF, &TGA, &DDS, &BMP, &ICO, &HDR, &OPENEXR, &FARBFELD, &AVIF,
-];
-
 pub static PNG: Lazy<FormatInfo> = Lazy::new(|| FormatInfo {
     format: Format::Png,
     extensions: vec!["png"],
