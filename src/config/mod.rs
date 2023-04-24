@@ -12,6 +12,7 @@ pub struct SizeSetting {
     pub height: u32,
 }
 #[derive(Default, Debug, Clone, Builder, PartialEq)]
+#[builder(default)]
 pub struct ImageOperations {
     pub blur: Option<f32>,
     pub contrast: Option<f32>,
@@ -19,6 +20,7 @@ pub struct ImageOperations {
     pub invert: Option<bool>,
 }
 #[derive(Default, Debug, Clone, Builder, PartialEq)]
+#[builder(default)]
 pub struct ImageConfig {
     pub size: Option<SizeSetting>,
     pub filter: Option<FilterType>,
@@ -26,12 +28,14 @@ pub struct ImageConfig {
     pub operations: Option<ImageOperations>,
 }
 #[derive(Clone, Default, Debug, Builder, PartialEq)]
+#[builder(default)]
 pub struct PngConfig {
     pub base: ImageConfig,
     pub compression: CompressionType,
     pub filter: image::codecs::png::FilterType,
 }
 #[derive(Clone, SmartDefault, Debug, Builder, PartialEq)]
+#[builder(default)]
 pub struct JpegConfig {
     pub base: ImageConfig,
     #[default = 80]
@@ -39,11 +43,13 @@ pub struct JpegConfig {
     pub pixel_density: PixelDensity,
 }
 #[derive(Clone, Default, Debug, Builder, PartialEq)]
+#[builder(default)]
 pub struct BmpConfig {
     pub base: ImageConfig,
 }
 
 #[derive(Clone, SmartDefault, Builder, Debug)]
+#[builder(default)]
 pub struct GifConfig {
     pub base: ImageConfig,
     #[default = 1]
@@ -52,17 +58,21 @@ pub struct GifConfig {
 }
 
 #[derive(Clone, Default, Debug, Builder, PartialEq)]
+#[builder(default)]
 pub struct TiffConfig {
     pub base: ImageConfig,
 }
 
 #[derive(Clone, Default, Debug, Builder, PartialEq)]
+#[builder(default)]
 pub struct WebPConfig {
     pub base: ImageConfig,
 }
 #[derive(Clone, Default, Debug, Builder, PartialEq)]
+#[builder(default)]
 pub struct PdfConfig {}
 #[derive(Clone, Default, Debug, Builder, PartialEq)]
+#[builder(default)]
 pub struct SvgConfig {}
 
 #[non_exhaustive]

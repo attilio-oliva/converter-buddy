@@ -101,4 +101,34 @@ impl Format {
             Format::Pdf => &info::PDF,
         }
     }
+    /// Returns the format type (Audio, Document, Image or Video ) as a FormatKind enumerator
+    pub fn kind(&self) -> FormatKind {
+        match self {
+            Format::Png
+            | Format::Jpeg
+            | Format::Gif
+            | Format::WebP
+            | Format::Pnm
+            | Format::Tiff
+            | Format::Tga
+            | Format::Dds
+            | Format::Bmp
+            | Format::Ico
+            | Format::Hdr
+            | Format::OpenExr
+            | Format::Farbfeld
+            | Format::Avif
+            | Format::Svg => FormatKind::Image,
+            Format::Pdf => FormatKind::Document,
+        }
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Display, EnumIter, EnumString)]
+#[strum(serialize_all = "PascalCase")]
+pub enum FormatKind {
+    Audio,
+    Document,
+    Image,
+    Video,
 }

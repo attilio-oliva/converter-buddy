@@ -18,7 +18,7 @@ pub use webp::WebPConverter;
 
 use crate::{config::Config, format::Format};
 
-use super::{ConversionError, ConversionStrategy};
+use super::{ConversionError, ConversionStrategy, ConverterInfo};
 
 #[non_exhaustive]
 pub enum Converter {
@@ -46,6 +46,18 @@ impl Converter {
             Converter::Bmp(c) => c.process(input, output, config),
             Converter::WebP(c) => c.process(input, output, config),
             Converter::Svg(c) => c.process(input, output, config),
+        }
+    }
+
+    pub fn supported_formats(&self) -> Vec<Format> {
+        match self {
+            Converter::Jpeg(c) => c.supported_formats(),
+            Converter::Png(c) => c.supported_formats(),
+            Converter::Gif(c) => c.supported_formats(),
+            Converter::Tiff(c) => c.supported_formats(),
+            Converter::Bmp(c) => c.supported_formats(),
+            Converter::WebP(c) => c.supported_formats(),
+            Converter::Svg(c) => c.supported_formats(),
         }
     }
 }
